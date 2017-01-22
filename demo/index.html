@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+  <head>
+    <title>bb-input-email demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../bb-input-email.html">
+    <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
+    <link rel="import" href="../../paper-spinner/paper-spinner.html">
+    <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+    <link rel="import" href="../../iron-icons/iron-icons.html">
+    <link rel="import" href="../../iron-form/iron-form.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+
+    </style>
+  </head>
+  <body>
+
+    <div class="vertical-section-container centered">
+      <h3>Basic bb-input-email Demo</h3>
+      <demo-snippet>
+        <template>
+          <div class="card" >
+              <form is="iron-form" method="get" action="/" id="eventsDemo" >
+                <paper-button raised onclick="_loadMain(event)">Initialization</paper-button>
+                <bb-input-email
+                      id="inputEmail"
+                      label="Email"
+                      email-label="Email"
+                      show-value
+                      required
+                      maxlength="20"
+                      >
+                      <iron-icon prefix icon="icons:password" ></iron-icon>
+                      <iron-icon hidden$="[[!_showClearIcon(inputEmail.value)]]" class="clear" suffix icon="icons:clear" onclick="_clearInput(event)" alt="clear" title="clear" ></iron-icon>
+                </bb-input-email>
+                <paper-button raised id="setValue" onclick="clickMe(event)">Set email</paper-button>
+                <!-- Submit and Reset for form -->
+                <paper-button raised onclick="_delayedSubmit(event)" disabled id="eventsDemoSubmit">
+                  <paper-spinner id="spinner" hidden></paper-spinner>Submit</paper-button>
+                <paper-button raised onclick="_reset(event)">Reset</paper-button>
+
+                <div class="output"></div>
+              </form>
+
+          </div>
+        </template>
+      </demo-snippet>
+    </div>
+
+    <script>
+        function _loadMain(event) {
+          eventsDemo.addEventListener('change', function(event) {
+            // Validate the entire form to see if we should enable the `Submit` button.
+            eventsDemoSubmit.disabled = !eventsDemo.validate();
+          });
+
+          eventsDemo.addEventListener('iron-form-submit', function(event) {
+            spinner.active = false;
+            spinner.hidden = true;
+            eventsDemoSubmit.disabled = false;
+            this.querySelector('.output').innerHTML = JSON.stringify(event.detail);
+          });
+
+          document.getElementById('inputEmail').addEventListener('bb-input-email-error-message',function (event) {
+            var msg = '';
+            console.log(event.detail.code); // true
+
+            if(event.detail.code == 'error-email-invalid') {
+              msg= 'Email is invalid.';
+            }
+            else if(event.detail.code == 'error-email-null') {
+              msg= 'Email must be existed.';
+            }
+            document.getElementById('inputEmail').setAttribute('error-message',msg);
+          });
+
+        }
+
+        function _delayedSubmit(event) {
+          spinner.active = true;
+          spinner.hidden = false;
+          eventsDemoSubmit.disabled = true;
+          // Simulate a slow server response.
+          setTimeout(function() {
+            Polymer.dom(event).localTarget.parentElement.submit();
+          }, 1000);
+        }
+
+        function _reset(event) {
+          var form = Polymer.dom(event).localTarget.parentElement;
+          form.reset();
+          form.querySelector('.output').innerHTML = '';
+        }
+
+        function clickMe(event) {
+          document.getElementById('inputEmail').value = 'spitzman@naver.com';
+        }
+
+        function _clearInput(event) {
+          document.getElementById('inputEmail').clearValue();
+        }
+
+    </script>
+  </body>
+</html>

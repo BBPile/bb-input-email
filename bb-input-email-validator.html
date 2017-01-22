@@ -1,0 +1,47 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-validator-behavior/iron-validator-behavior.html">
+
+<script>
+  Polymer({
+    is: 'bb-input-email-validator',
+
+    behaviors: [
+      Polymer.IronValidatorBehavior
+    ],
+    properties: {
+      emailPattern: {
+        type: String,
+        value: function() {
+          return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        }
+      }
+    },
+    // validate the value.
+    validate: function(value) {
+      var errCode = '';
+      var valid = false;
+
+      if (value) {
+        valid = true;
+      } else {
+        errCode = 'error-email-null';
+      }
+
+
+      if (valid && this.emailPattern) {
+        var regexp = new RegExp(this.emailPattern);
+
+        valid = regexp.test( value ) ? true: false;
+        errCode = !valid ? 'error-email-invalid' : '';
+        regexp = null;
+
+      }
+
+      // announce error-message
+      if (!valid) {
+        this.fire('bb-input-email-error-message', {code: errCode});
+      }
+      return valid;
+    }
+  });
+</script>
